@@ -41,8 +41,8 @@
 
         var options = {
           chart: {
-            title: 'Masalah Registrasi'
-          }          
+            title: 'Masalah Registrasi',            
+          }                 
         };
 
         var chart = new google.charts.Bar(document.getElementById('columnchart_material'));

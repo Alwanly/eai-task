@@ -43,11 +43,20 @@
             <div class="col">
                 <div class="panel-group">
                     <div class="panel panel-default">                    
+                    <iframe src="pie_lomba.php" width="100%" height="440px"></iframe>
+               </div>
+            </div>
+        </div> 
+        </div>  
+        <div class="row">
+            <div class="col">
+                <div class="panel-group">
+                    <div class="panel panel-default">                    
                     <iframe src="bar_beasiswa.php" width="100%" height="440px"></iframe>
                </div>
             </div>
         </div> 
-        </div>                        
+        </div>                       
     </div>
 </body>
 </html>

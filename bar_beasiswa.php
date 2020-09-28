@@ -1,9 +1,9 @@
 <?php
         include 'connection.php';
-        $lomba = mysqli_query($con,"SELECT COUNT(NIM) as jml, nama_lomba as lomba FROM keaktifan GROUP BY nama_lomba");        
+        $lomba = mysqli_query($con,"SELECT COUNT(NIM) as jml, beasiswa FROM keaktifan WHERE beasiswa != '' GROUP BY beasiswa");        
         while($row = mysqli_fetch_array($lomba)){
             $juml[] = $row['jml'];
-            $nama_lomba[] = $row['lomba'];
+            $nama_lomba[] = $row['beasiswa'];
         }                   
     ?>
 <!DOCTYPE html>
@@ -19,7 +19,7 @@
 
       function drawStuff() {
         var data = new google.visualization.arrayToDataTable([  
-          ['Nama Lomba', 'Percentage'],        
+          ['Nama Beasiswa', 'Percentage'],        
          <?php for($i = 0; $i < count($juml)-2; $i++) { ?>
          ["<?php echo $nama_lomba[$i] ?>", <?php echo $juml[$i] ?>],
          <?php }?>
@@ -30,9 +30,11 @@
           width: 800,
           legend: { position: 'none' },
           chart: {
-            title: 'Persebaran Lomba'
+            title: 'Persebaran Beasiswa'
             },        
-          bar: { groupWidth: "90%" }
+            width: 1100,
+        height: 400,
+          bar: { groupWidth: "30%" }
         };
 
         var chart = new google.charts.Bar(document.getElementById('top_x_div'));
