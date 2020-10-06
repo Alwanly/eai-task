@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tugas EAI</title>
+     <!-- Boostrap and CSS -->
+     <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/css/bootstrap.min.css" integrity="sha384-JcKb8q3iqJ61gNV9KGb8thSsNjpSL0n8PARn9HuZOnIxN0hoP+VmmDGMN5t9UJ0Z" crossorigin="anonymous">
+     <!-- plotly js -->
+     <script src="https://cdn.plot.ly/plotly-lates t.min.js"></script>
+     <script src="https://cdn.plot.ly/plotly-1.2.0.min.js"></script>
+     <style>
+         .footer {
+             padding: 10px;
+             position: relative;
+             bottom: 0;
+             width: 100%;
+             background-color: #333;
+             color:#fff;
+             }
+        .card-covid{     
+            padding: 20px 0;            
+            text-align: center;
+        }
+     </style>
+</head>
+<body>
+    <header>
+        <nav class="navbar navbar-expand-lg navbar-light bg-danger">       
+            <div class="container">            
+                <a class="navbar-brand text-white" href="3">Enterprise Application Integration</a>              
+            </div>
+        </div>
+        </nav>
+    </header>
+    <div class="container"> 
+        <div class="row">
+
+            <div class="card m-3 col-12">            
+                <div class="card-header">
+                    <h5 class="text-center">Pertumbuhan Kasus Covid-19 di Dunia</h5>
+                </div>
+                <div class="card-body">                                        
+                    <div class="row">
+                        <div class="col-4">
+                            <div class="card text-white bg-primary mb-3 card-covid" style="width: 18rem; height: 10rem;">                               
+                                <div class="card-body">
+                                  <h3 class="card-title">Confirmed Positif</h3>   
+                                  <h4 class="card-text text-white font-weight-bold"  id="confirmed"></h4>                               
+                                </div>
+                              </div>
+                        </div>
+                        <div class="col-4">                            
+                            <div class="card text-white bg-success mb-3 card-covid" style="width: 18rem; height: 10rem;">                               
+                                <div class="card-body">
+                                  <h3 class="card-title">Sembuh</h3>   
+                                  <h4 class="card-text text-white font-weight-bold"  id="recovered"></h4>                               
+                                </div>
+                              </div>                                                           
+                        </div>
+                        <div class="col-4">
+                            <div class="card text-white bg-danger mb-3 card-covid" style="width: 18rem; height: 10rem;">                               
+                                <div class="card-body">
+                                  <h3 class="card-title">Sembuh</h3>   
+                                  <h4 class="card-text text-white font-weight-bold"  id="death"></h4>                               
+                                </div>
+                              </div>  
+                        </div>
+                    </div>        
+                </div>
+            </div>
+            <div class="card m-3 col-12">           
+
+            <div class="card-body">
+                <div id="chartplotly"></div>
+            </div>
+            </div>
+        </div>     
+    </div>
+    <footer class="footer bg-danger">        
+        <div class="text-center">@2020 <a href="http://alwanly.tech/" class="text-blue">alwanly.tech</a></div>
+    </footer>
+</body>
+<script>      
+    const getData =async()=>{
+        const date = [];
+        const confirmed = [];
+        const recovered = [];
+        const death = [];
+        
+        const resRecovered = await fetch("https://api.covid19api.com/dayone/country/sri-lanka/status/recovered/live");
+        const resConfirmed = await fetch("https://api.covid19api.com/dayone/country/sri-lanka/status/confirmed/live");
+        const resDeaths = await fetch("https://api.covid19api.com/dayone/country/sri-lanka/status/deaths/live");
+          
+        const dataConfirmed = await resConfirmed.json();
+        const dataDeaths = await resDeaths.json();
+        const dataRecovered = await resRecovered.json();   
+        
+        for(let i = 0 ; i<dataRecovered.length;i++){
+            date.push(dataRecovered[i]["Date"]);
+            confirmed.push(dataConfirmed[i]["Cases"]);
+            recovered.push(dataRecovered[i]["Cases"]);
+            death.push(dataDeaths[i]["Cases"]);
+        }
+        return {date,confirmed,recovered,death};
+    }       
+
+    const fetchPromise = fetch("https://api.covid19api.com/world/total");
+    fetchPromise
+        .then(response=>{
+        return response.json()
+        })
+        .then(dataCovid=>{
+            document.getElementById("confirmed").innerHTML= dataCovid.TotalConfirmed
+            document.getElementById("recovered").innerHTML= dataCovid.TotalRecovered
+            document.getElementById("death").innerHTML= dataCovid.TotalDeaths
+        });
+
+    function toDate(ts) {
+	    return new Date(ts);
+    } 
+    const drawChart =async()=>{
+        const dataConvid = await getData();  
+             
+        const dataSetActive = {
+            x:dataConvid.date.map(toDate),
+            y:dataConvid.confirmed,
+            mode:'line',
+            type:'scatter',
+            name:'Positif',
+            line:{color:'blue'}
+        }
+        const dataSetRecovered={
+            x:dataConvid.date.map(toDate),
+            y:dataConvid.recovered,
+            mode:'line',
+            type:'scatter',
+            name:'Sembuh',
+            line:{color:'green'}
+        }
+        const dataSetDeath ={
+            x:dataConvid.date.map(toDate),
+            y:dataConvid.death,
+            mode:'line',
+            type:'scatter',
+            name:'Meninggal',
+            line: {color:'red'}
+        }
+        const data = [dataSetRecovered,dataSetActive,dataSetDeath];
+        const layout = { 
+
+            title: 'Pertumbuhan Kasus Covid-19 di Sri-lanka', 
+            xaxis:{
+                title:'Months',
+                type:'date',
+                tickformat: '%b %Y',
+            }
+        };
+        const config = { 
+            scrollZoom: false,
+            responsive: true,
+            displaylogo: false
+            }
+        Plotly.newPlot("chartplotly",data,layout,config);
+    }
+    drawChart();
+</script>
+<script src="https://code.jquery.com/jquery-3.5.1.slim.min.js" integrity="sha384-DfXdz2htPH0lsSSs5nCTpuj/zy4C+OGpamoFVy38MVBnE+IbbVYUew+OrCXaRkfj" crossorigin="anonymous"></script>
+<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.1/dist/umd/popper.min.js" integrity="sha384-9/reFTGAW83EW2RDu2S0VKaIzap3H66lZH81PoYlFhbGU+6BZp6G7niu735Sk7lN" crossorigin="anonymous"></script>
+<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.5.2/js/bootstrap.min.js" integrity="sha384-B4gt1jrGC7Jh4AgTPSdUtOBvfO8shuf57BaghqFfPlYxofvL8/KUEfYiJOMMV+rV" crossorigin="anonymous"></script>
+</html>
