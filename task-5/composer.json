@@ -1,0 +1,11 @@
+{
+    "name": "alwan/g-rpc-server",
+    "description": "Client php",
+    "authors": [
+        {
+            "name": "Alwan Alyafi Mulyawan",
+            "email": "alwanalyafi7@gmail.com"
+        }
+    ],
+    "require": {}
+}
